@@ -1,0 +1,1 @@
+Eneida's proposed exercises
