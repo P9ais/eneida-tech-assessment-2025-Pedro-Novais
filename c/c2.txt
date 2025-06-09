@@ -1,0 +1,12 @@
+The answer to this question is based mostly on investigation.
+
+- Common failure Scenarios:
+	- Losing network connection
+	- Corrupted files, wrong version for devices, compatibility checks
+	- Power loss during writing to flash memory along with bad memory blocks or unexpected interruptions
+	- Constant resets or no booting after flashing
+	
+- Mechanisms to ensure device resilience:
+	- Secure Boot: Verify authenticity and integrity of the new software using digital signatures.
+	- Dual Bank Partitioning: Dividing the device's flash memory in two separate areas. The device runs from one while the update is written to the other. If the update fails, the device can simply revert to the working version.
+	- Robust bootloader: The bootloader should be able to detect if a new update fails to boot multiple times and automatically switch back to the last known good software version.

@@ -1,0 +1,26 @@
+The answer to this question is based mostly on investigation, with some inputs from my experience in AutoSAR development.
+
+The SPI configuration and initialization should be performed on system startup following the aspects:
+- The microcontroller will generate the clock, control the MISO and MOSI lines and Chip Select, acting as the SPI master.
+- For the clock polarity this is defined in the peripheral's datasheet that we are using. CPOL defines the idle state of the clock line. CPHA defines when data is sampled considering the clock edge (o- is sampled on the first clock edge after SCK changes state; 1- is sampled on the second clock edge after SCK changes state). These should be defined according to the sensor needs.
+- Baud Rate should be defined within the peripheral's limits to avoid communication errors. From previous experiences I had configuring clocktrees in AutoSAR (MCU module), the system clock will pass through a prescaler in order to obtain the SPI clock.
+
+Driver Architecture:
+- We are basically deciding between polling or interrupt-driven. The polling method is easier to implement but consumes more CPU and impacts system performance because it will be looping throught status checks in SPI's registers - will not perform any other tasks. The interrupt-driven is more difficult to implement and can lead to overhead, but allows the CPU to perform other tasks concurrently, which will improve system's performance.
+
+Abstraction:
+- The hardware abstraction layer will abstract the microcontroller's hardware registers, and the higher layers will be able to interact with the SPI module.
+- The application level API (high-level) will provide functions to the developer where he/she can access the low-level registers, and write/read data from them. 
+
+Initialization Sequence:
+- Power On
+- Power-up stabilization time (present in peripheral's datasheet)
+- Hardware Abstraction Layer Initialization
+- Chip Select Configuration
+- Peripheral's Registers Configuration
+
+Error Checking Mechanisms:
+- Timeouts - Implement a timer to check if a function is completed within a time limit. Maybe could be used Wdg supervision?
+- Status Registers - Read status registers to understand if there were any errors (error flags, for example).
+
+

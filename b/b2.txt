@@ -1,0 +1,20 @@
+The answer to this question is based mostly on investigation, with some inputs from my experience in AutoSAR development.
+
+1- Initialize ADC (if not already initialized). Besides selecting the analog pins, conversion clock, sampling rate, etc, we need to configure the ADC to generate a DMA trigger event.
+2- Initialize DMA controller.
+3- Configure DMA channel. 
+	3.1 For the specific case of PIC32MZ family we could configure one of 8 or 12 channels depending on the specific controller from the PIC32MZ family.
+	3.2 Set source (DCHxSSA - ADC) and destination addresses (DCHxDSA).
+	3.3 Set sizes - source and destination. 
+	3.4 DMA transfer mode
+	3.5 Set interrupts. The block tranfers complete interrupt will notify the CPU when a buffer from ADC is ready.
+	3.6 Enable the chosen DMA channel (DCHxCON.CHEN = 1)
+	3.7 Start transfer.
+	
+
+Real use case: MPPT Inverter Controller
+- The MPPTs need to maximize the power extracted from solar panels, that will later be converted from DC-AC. These voltages and currents from DC are monitored and can be transfered using DMA to have the accurate sensor data to manage the inverters.
+- Advantages:
+	- Real time performance - DMA transfers data with very low latency, so the sensor's data will be passed "instantly" when needed, so higher MPPT efficiency.
+	- Without DMA there would be a high volume of interrupts leading to CPU context switching overhead (due to ADC conversions, for example). DMA reduces the number of interrupts, for example, by triggering one interrupt for each ADC full scan.
+	- More efficient CPU because it will only be "waked up" when DMA's interrupt signals a set of data to process.
